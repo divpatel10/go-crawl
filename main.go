@@ -17,7 +17,6 @@ func getHref(t html.Token) (ok bool, href string) {
 			href = a.Val
 			ok = true
 		}
-
 	}
 	return
 }

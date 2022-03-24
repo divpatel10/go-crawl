@@ -1,4 +1,4 @@
-module github.com/divpatel10/scraper-go
+module github.com/divpatel10/go-crawl
 
 go 1.17
 
