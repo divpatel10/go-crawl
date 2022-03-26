@@ -1,9 +1,8 @@
-package main
+package lightcrawl
 
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -83,13 +82,9 @@ func crawl(url string, ch chan string, chFin chan bool) {
 	}
 }
 
-func main() {
-
+func FromLink(seedUrls []string, etype string) map[string]bool {
 	// Map of passed URL and whether URLs were found for the given URL
 	foundUrls := make(map[string]bool)
-
-	// this variable stores the urls passed by the user
-	seedUrls := os.Args[1:]
 
 	// This channel is used to output all the found urls
 	chUrls := make(chan string)
@@ -122,12 +117,13 @@ func main() {
 	fmt.Println("\n\nFound ", len(foundUrls), " urls: ")
 
 	// Print all urls from the found URLs map
-	for url, _ := range foundUrls {
-		fmt.Println("\t" + url)
-	}
-	fmt.Print("\n\n")
+	// for url, _ := range foundUrls {
+	// 	fmt.Println("\t" + url)
+	// }
 
 	// Close the channels
 	close(chUrls)
 	close(chFin)
+
+	return foundUrls
 }
