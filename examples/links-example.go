@@ -11,7 +11,7 @@ func main() {
 	var url [1]string
 	url[0] = "https://google.com"
 
-	links := lightcrawl.FromLink(url[:], "a")
+	links := lightcrawl.Link(url[:])
 
 	// Print values to check
 	for url, _ := range links {

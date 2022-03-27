@@ -21,7 +21,7 @@ func getHref(t html.Token) (ok bool, href string) {
 }
 
 // This function crawls through a given url
-func crawl(url string, ch chan string, chFin chan bool) {
+func crawl(url string, ch chan string, chFin chan bool, etype string) {
 	// make a Get request for the URL and store the response
 	res, err := http.Get(url)
 
@@ -57,32 +57,31 @@ func crawl(url string, ch chan string, chFin chan bool) {
 		case curToken == html.StartTagToken:
 			ancTag := z.Token()
 			// if its an anchor tag:
-			isAnchor := ancTag.Data == "a"
+			tt := (ancTag.Data)
 
 			// if its not an anchor, just continue
-			if !isAnchor {
-				continue
-			}
+			if tt == "a" {
 
-			// get url from Href from the <a> tag
-			ok, url := getHref(ancTag)
+				// get url from Href from the <a> tag
+				ok, url := getHref(ancTag)
 
-			if !ok {
-				continue
-			}
+				if !ok {
+					continue
+				}
 
-			//store if the href starts with http
-			hasProto := strings.Index(url, "http") == 0
+				//store if the href starts with http
+				hasProto := strings.Index(url, "http") == 0
 
-			// publish the url to the channel
-			if hasProto {
-				ch <- url
+				// publish the url to the channel
+				if hasProto {
+					ch <- url
+				}
 			}
 		}
 	}
 }
 
-func FromLink(seedUrls []string, etype string) map[string]bool {
+func Link(seedUrls []string) map[string]bool {
 	// Map of passed URL and whether URLs were found for the given URL
 	foundUrls := make(map[string]bool)
 
@@ -96,7 +95,7 @@ func FromLink(seedUrls []string, etype string) map[string]bool {
 	for _, url := range seedUrls {
 
 		// For each URL, start a go routine to scrape a website
-		go crawl(url, chUrls, chFin)
+		go crawl(url, chUrls, chFin, "a")
 
 	}
 
