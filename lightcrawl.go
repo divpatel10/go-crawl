@@ -81,7 +81,7 @@ func crawl(url string, ch chan string, chFin chan bool, etype string) {
 	}
 }
 
-func Link(seedUrls []string) map[string]bool {
+func Scrape(element string, seedUrls []string) map[string]bool {
 	// Map of passed URL and whether URLs were found for the given URL
 	foundUrls := make(map[string]bool)
 
@@ -95,7 +95,7 @@ func Link(seedUrls []string) map[string]bool {
 	for _, url := range seedUrls {
 
 		// For each URL, start a go routine to scrape a website
-		go crawl(url, chUrls, chFin, "a")
+		go crawl(url, chUrls, chFin, element)
 
 	}
 
@@ -114,11 +114,6 @@ func Link(seedUrls []string) map[string]bool {
 	}
 
 	fmt.Println("\n\nFound ", len(foundUrls), " urls: ")
-
-	// Print all urls from the found URLs map
-	// for url, _ := range foundUrls {
-	// 	fmt.Println("\t" + url)
-	// }
 
 	// Close the channels
 	close(chUrls)
