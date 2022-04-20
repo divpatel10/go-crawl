@@ -14,6 +14,8 @@ func main() {
 	links := lightcrawl.Scrape("a", url[:])
 
 	// Print values to check
+	fmt.Println("\n\nFound ", len(links), " urls: ")
+
 	for url, _ := range links {
 		fmt.Println("\t" + url)
 	}

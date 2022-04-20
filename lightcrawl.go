@@ -55,25 +55,23 @@ func crawl(url string, ch chan string, chFin chan bool, etype string) {
 
 		// StartTag -> eg <html> <a> <body> etc
 		case curToken == html.StartTagToken:
-			ancTag := z.Token()
-			// if its an anchor tag:
-			tt := (ancTag.Data)
+			tt := z.Token()
 
 			// if its not an anchor, just continue
-			if tt == "a" {
+			if tt.Data == "a" {
 
 				// get url from Href from the <a> tag
-				ok, url := getHref(ancTag)
+				ok, url := getHref(tt)
 
 				if !ok {
 					continue
 				}
 
 				//store if the href starts with http
-				hasProto := strings.Index(url, "http") == 0
+				hasHttp := strings.Index(url, "http") == 0
 
 				// publish the url to the channel
-				if hasProto {
+				if hasHttp {
 					ch <- url
 				}
 			}
@@ -112,8 +110,6 @@ func Scrape(element string, seedUrls []string) map[string]bool {
 			c++
 		}
 	}
-
-	fmt.Println("\n\nFound ", len(foundUrls), " urls: ")
 
 	// Close the channels
 	close(chUrls)
