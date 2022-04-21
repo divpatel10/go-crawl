@@ -6,7 +6,8 @@ import (
 	lightcrawl "github.com/divpatel10/lightcrawl"
 )
 
-func main() {
+// Example to crawl Links
+func links() {
 
 	var url [2]string
 	url[0] = "https://google.com"
@@ -19,5 +20,21 @@ func main() {
 	for url, _ := range links {
 		fmt.Println("\t" + url)
 	}
+
+}
+
+// Example to Crawl Lists
+func lists() {
+	var url [1]string
+	url[0] = "https://web.ics.purdue.edu/~gchopra/class/public/pages/webdesign/05_simple.html"
+
+	links := lightcrawl.Scrape("li", url[:])
+
+	for url, _ := range links {
+		fmt.Println("\t" + url)
+	}
+}
+
+func main() {
 
 }
