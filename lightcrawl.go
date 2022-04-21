@@ -43,6 +43,8 @@ func crawl(url string, ch chan string, chFin chan bool, etype string) {
 
 	// Divide the html body into tokens
 	z := html.NewTokenizer(body)
+	var isList bool
+	var curTag bool
 
 	// Iterate through all the tokens
 	for {
@@ -57,24 +59,42 @@ func crawl(url string, ch chan string, chFin chan bool, etype string) {
 		case curToken == html.StartTagToken:
 			tt := z.Token()
 
+			curTag = tt.Data == etype
+			if curTag {
+				print(tt.Data, "\t")
+			}
+			isList = tt.Data == "li"
+
 			// if its not an anchor, just continue
 			if tt.Data == "a" {
 
-				// get url from Href from the <a> tag
-				ok, url := getHref(tt)
+				if curTag {
+					// get url from Href from the <a> tag
+					ok, url := getHref(tt)
 
-				if !ok {
-					continue
+					if !ok {
+						continue
+					}
+
+					//store if the href starts with http
+					hasHttp := strings.Index(url, "http") == 0
+
+					// publish the url to the channel
+					if hasHttp {
+						ch <- url
+					}
 				}
 
-				//store if the href starts with http
-				hasHttp := strings.Index(url, "http") == 0
-
-				// publish the url to the channel
-				if hasHttp {
-					ch <- url
-				}
 			}
+
+		case curToken == html.TextToken:
+			tt := z.Token()
+
+			fmt.Println(isList, curTag)
+			if isList && curTag {
+				ch <- tt.Data
+			}
+
 		}
 	}
 }
