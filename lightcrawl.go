@@ -60,9 +60,6 @@ func crawl(url string, ch chan string, chFin chan bool, etype string) {
 			tt := z.Token()
 
 			curTag = tt.Data == etype
-			if curTag {
-				print(tt.Data, "\t")
-			}
 			isList = tt.Data == "li"
 
 			// if its not an anchor, just continue
@@ -90,7 +87,6 @@ func crawl(url string, ch chan string, chFin chan bool, etype string) {
 		case curToken == html.TextToken:
 			tt := z.Token()
 
-			fmt.Println(isList, curTag)
 			if isList && curTag {
 				ch <- tt.Data
 			}
