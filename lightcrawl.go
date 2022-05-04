@@ -43,12 +43,18 @@ func crawl(url string, ch chan string, chFin chan bool, etype string) {
 
 	// Divide the html body into tokens
 	z := html.NewTokenizer(body)
-	var isList bool
-	var curTag bool
 
 	// Iterate through all the tokens
 	for {
 		curToken := z.Next()
+
+		// Map key to true if the specific tag is asked for
+		tag := map[string]bool{
+			"li":    false,
+			"a":     false,
+			"title": false,
+			"td":    false,
+		}
 
 		switch {
 		// Stop processing if there is an error tokem
@@ -59,27 +65,30 @@ func crawl(url string, ch chan string, chFin chan bool, etype string) {
 		case curToken == html.StartTagToken:
 			tt := z.Token()
 
-			curTag = tt.Data == etype
-			isList = tt.Data == "li"
+			_, ok := tag[etype]
+
+			if ok {
+				tag[etype] = tt.Data == etype
+			} else {
+				chFin <- true
+			}
 
 			// if its not an anchor, just continue
-			if tt.Data == "a" {
+			if tag["a"] {
 
-				if curTag {
-					// get url from Href from the <a> tag
-					ok, url := getHref(tt)
+				// get url from Href from the <a> tag
+				ok, a_url := getHref(tt)
 
-					if !ok {
-						continue
-					}
+				if !ok {
+					continue
+				}
 
-					//store if the href starts with http
-					hasHttp := strings.Index(url, "http") == 0
+				//store if the href starts with http
+				hasHttp := strings.Index(url, "http") == 0
 
-					// publish the url to the channel
-					if hasHttp {
-						ch <- url
-					}
+				// publish the url to the channel
+				if hasHttp {
+					ch <- a_url
 				}
 
 			}
@@ -87,10 +96,9 @@ func crawl(url string, ch chan string, chFin chan bool, etype string) {
 		case curToken == html.TextToken:
 			tt := z.Token()
 
-			if isList && curTag {
+			if tag["li"] {
 				ch <- tt.Data
 			}
-
 		}
 	}
 }
@@ -107,10 +115,8 @@ func Scrape(element string, seedUrls []string) map[string]bool {
 
 	// Go over all the URLs in the Seed URLs
 	for _, url := range seedUrls {
-
 		// For each URL, start a go routine to scrape a website
 		go crawl(url, chUrls, chFin, element)
-
 	}
 
 	// Go over all Urls, and subscribe to the channels

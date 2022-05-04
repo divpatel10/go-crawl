@@ -37,5 +37,5 @@ func lists() {
 
 func main() {
 	lists()
-	links()
+	// links()
 }
