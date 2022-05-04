@@ -28,7 +28,7 @@ func lists() {
 	var url [1]string
 	url[0] = "https://web.ics.purdue.edu/~gchopra/class/public/pages/webdesign/05_simple.html"
 
-	links := lightcrawl.Scrape("li", url[:])
+	links := lightcrawl.Scrape("p", url[:])
 
 	for url, _ := range links {
 		fmt.Println("\t" + url)

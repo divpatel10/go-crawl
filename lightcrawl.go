@@ -48,6 +48,10 @@ func crawl(url string, ch chan string, chFin chan bool, etype string) {
 		"a":     false,
 		"title": false,
 		"td":    false,
+		"h1":    false,
+		"h2":    false,
+		"h3":    false,
+		"p":     false,
 	}
 	// Iterate through all the tokens
 	for {
@@ -94,7 +98,7 @@ func crawl(url string, ch chan string, chFin chan bool, etype string) {
 		case curToken == html.TextToken:
 			tt := z.Token()
 
-			if tag["li"] {
+			if tag["li"] || tag["h1"] || tag["h2"] || tag["p"] {
 				ch <- tt.Data
 			}
 		}
