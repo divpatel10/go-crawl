@@ -43,18 +43,17 @@ func crawl(url string, ch chan string, chFin chan bool, etype string) {
 
 	// Divide the html body into tokens
 	z := html.NewTokenizer(body)
-
+	tag := map[string]bool{
+		"li":    false,
+		"a":     false,
+		"title": false,
+		"td":    false,
+	}
 	// Iterate through all the tokens
 	for {
 		curToken := z.Next()
 
 		// Map key to true if the specific tag is asked for
-		tag := map[string]bool{
-			"li":    false,
-			"a":     false,
-			"title": false,
-			"td":    false,
-		}
 
 		switch {
 		// Stop processing if there is an error tokem
@@ -90,7 +89,6 @@ func crawl(url string, ch chan string, chFin chan bool, etype string) {
 				if hasHttp {
 					ch <- a_url
 				}
-
 			}
 
 		case curToken == html.TextToken:
