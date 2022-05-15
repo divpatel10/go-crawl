@@ -10,7 +10,7 @@ import (
 func links() {
 
 	var url [2]string
-	url[0] = "https://google.com"
+	url[0] = "https://www.google.com/search?q=barcelona"
 	url[1] = "https://netflix.com"
 	links := lightcrawl.Scrape("a", url[:])
 
@@ -36,6 +36,6 @@ func lists() {
 }
 
 func main() {
-	lists()
-	// links()
+	// lists()
+	links()
 }

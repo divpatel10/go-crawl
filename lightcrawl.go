@@ -8,6 +8,11 @@ import (
 	"golang.org/x/net/html"
 )
 
+type Link struct {
+	Href string
+	Text string
+}
+
 // Function that takes an html token and gets the href value from the tag
 func getHref(t html.Token) (ok bool, href string) {
 	// iterate through the token attributes
@@ -52,6 +57,7 @@ func crawl(url string, ch chan string, chFin chan bool, etype string) {
 		"h2":    false,
 		"h3":    false,
 		"p":     false,
+		// "td":    false,
 	}
 	// Iterate through all the tokens
 	for {

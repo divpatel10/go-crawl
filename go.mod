@@ -1,5 +1,5 @@
 module github.com/divpatel10/lightcrawl
 
-go 1.17
+go 1.18
 
-require golang.org/x/net v0.0.0-20220225172249-27dd8689420f
+require golang.org/x/net v0.0.0-20220513224357-95641704303c
