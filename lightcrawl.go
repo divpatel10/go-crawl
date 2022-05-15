@@ -57,7 +57,6 @@ func crawl(url string, ch chan string, chFin chan bool, etype string) {
 		"h2":    false,
 		"h3":    false,
 		"p":     false,
-		// "td":    false,
 	}
 	// Iterate through all the tokens
 	for {
@@ -104,26 +103,26 @@ func crawl(url string, ch chan string, chFin chan bool, etype string) {
 		case curToken == html.TextToken:
 			tt := z.Token()
 
-			if tag["li"] || tag["h1"] || tag["h2"] || tag["p"] {
+			if tag["li"] || tag["h1"] || tag["h2"] || tag["p"] || tag["td"] {
 				ch <- tt.Data
 			}
 		}
 	}
 }
 
-func Scrape(element string, seedUrls []string) map[string]bool {
+func Scrape[T bool](element string, seedUrls []string) map[string]T {
 	// Map of passed URL and whether URLs were found for the given URL
-	foundUrls := make(map[string]bool)
+	foundUrls := make(map[string]T)
 
-	// This channel is used to output all the found urls
+	// channel used to output all the found urls
 	chUrls := make(chan string)
 
-	// This channel lets us know that that we have found all the URLs
+	// channel to lets us know that that we have found all the URLs
 	chFin := make(chan bool)
 
 	// Go over all the URLs in the Seed URLs
 	for _, url := range seedUrls {
-		// For each URL, start a go routine to scrape a website
+		// For each URL, start a routine to scrape the site
 		go crawl(url, chUrls, chFin, element)
 	}
 
@@ -133,6 +132,7 @@ func Scrape(element string, seedUrls []string) map[string]bool {
 
 		// if its a url channel, change the foundUrls map value to true
 		case url := <-chUrls:
+			println("Ayoo \t%s", c)
 			foundUrls[url] = true
 
 		// if a channel is finished outputting, move on to the next channel
