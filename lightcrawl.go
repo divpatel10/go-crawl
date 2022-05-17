@@ -13,6 +13,11 @@ type Link struct {
 	Text string
 }
 
+type Result struct {
+	SeedLink string
+	Value    string
+}
+
 // Function that takes an html token and gets the href value from the tag
 func getHref(t html.Token) (ok bool, href string) {
 	// iterate through the token attributes
@@ -26,7 +31,7 @@ func getHref(t html.Token) (ok bool, href string) {
 }
 
 // This function crawls through a given url
-func crawl(url string, ch chan string, chFin chan bool, etype string) {
+func crawl(url string, ch chan Result, chFin chan bool, etype string) {
 	// make a Get request for the URL and store the response
 	res, err := http.Get(url)
 
@@ -96,7 +101,7 @@ func crawl(url string, ch chan string, chFin chan bool, etype string) {
 
 				// publish the url to the channel
 				if hasHttp {
-					ch <- a_url
+					ch <- Result{url, a_url}
 				}
 			}
 
@@ -104,18 +109,18 @@ func crawl(url string, ch chan string, chFin chan bool, etype string) {
 			tt := z.Token()
 
 			if tag["li"] || tag["h1"] || tag["h2"] || tag["p"] || tag["td"] {
-				ch <- tt.Data
+				ch <- Result{url, tt.Data}
 			}
 		}
 	}
 }
 
-func Scrape[T bool](element string, seedUrls []string) map[string]T {
+func Scrape[T []string](element string, seedUrls []string) map[string]T {
 	// Map of passed URL and whether URLs were found for the given URL
 	foundUrls := make(map[string]T)
 
 	// channel used to output all the found urls
-	chUrls := make(chan string)
+	chUrls := make(chan Result)
 
 	// channel to lets us know that that we have found all the URLs
 	chFin := make(chan bool)
@@ -132,8 +137,7 @@ func Scrape[T bool](element string, seedUrls []string) map[string]T {
 
 		// if its a url channel, change the foundUrls map value to true
 		case url := <-chUrls:
-			println("Ayoo \t%s", c)
-			foundUrls[url] = true
+			foundUrls[url.SeedLink] = append(foundUrls[url.SeedLink], url.Value)
 
 		// if a channel is finished outputting, move on to the next channel
 		case <-chFin:

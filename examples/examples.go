@@ -17,8 +17,11 @@ func links() {
 	// Print values to check
 	fmt.Println("\n\nFound ", len(links), " urls: ")
 
-	for url, _ := range links {
-		fmt.Println("\t" + url)
+	for url, val := range links {
+
+		for furl := range val {
+			fmt.Printf("%s \t %s\n", url, links[url][furl])
+		}
 	}
 
 }
