@@ -31,7 +31,7 @@ func getHref(t html.Token) (ok bool, href string) {
 }
 
 // This function crawls through a given url
-func crawl(url string, ch chan Result, chFin chan bool, etype string) {
+func Crawl(url string, ch chan Result, chFin chan bool, etype string) {
 	// make a Get request for the URL and store the response
 	res, err := http.Get(url)
 
@@ -115,7 +115,44 @@ func crawl(url string, ch chan Result, chFin chan bool, etype string) {
 	}
 }
 
-func Scrape[T []string](element string, seedUrls []string) map[string]T {
+func ScrapeId(url string, id string) string {
+	res, err := http.Get(url)
+
+	if err != nil {
+		fmt.Print("Error: ", err, "\n For URL\t", url)
+		return ""
+	}
+
+	body := res.Body
+	defer body.Close()
+
+	fmt.Println()
+
+	z := html.NewTokenizer(body)
+
+	for {
+		tt := z.Next()
+
+		switch tt {
+
+		case html.ErrorToken:
+			fmt.Println("Error reading the token")
+			return ""
+
+		case html.StartTagToken:
+			for _, attr := range z.Token().Attr {
+				// fmt.Println(strings.Clone((z.Token().Data)))
+				if attr.Key == "id" {
+					if attr.Val == id {
+						return z.Token().Data
+					}
+				}
+			}
+		}
+	}
+}
+
+func ScrapeElement[T []string](element string, seedUrls []string) map[string]T {
 	// Map of passed URL and whether URLs were found for the given URL
 	foundUrls := make(map[string]T)
 
@@ -128,7 +165,7 @@ func Scrape[T []string](element string, seedUrls []string) map[string]T {
 	// Go over all the URLs in the Seed URLs
 	for _, url := range seedUrls {
 		// For each URL, start a routine to scrape the site
-		go crawl(url, chUrls, chFin, element)
+		go Crawl(url, chUrls, chFin, element)
 	}
 
 	// Go over all Urls, and subscribe to the channels
